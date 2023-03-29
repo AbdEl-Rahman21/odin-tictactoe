@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Display
-  LINES = [
+  WINNING_COMBOS = [
     [1, 2, 3],
     [4, 5, 6],
     [7, 8, 9],
@@ -24,7 +24,7 @@ module Display
 
       player_info[:symbol] = gets.chomp
 
-      break unless number == 2 && player_info[:symbol] == player_1.symbol
+      break unless number == 2 && player_info[:symbol] == player1.symbol
 
       puts 'Symbol already picked'
     end
@@ -57,59 +57,76 @@ end
 class Game
   include Display
 
-  attr_accessor :tiles, :player_1, :player_2, :winning_combo
-
   def initialize
     @tiles = Array(1..9)
-    @winning_combo = LINES
+    @winning_combos = WINNING_COMBOS
+    @turn_counter = 0
+    @game_over = false
   end
 
-  def play
+  def create_game
     system('clear')
-
-    counter = 0
-    win = false
 
     create_players
 
+    play
+
+    repeat
+  end
+
+  private
+
+  attr_accessor :tiles,
+                :winning_combos,
+                :player1,
+                :player2,
+                :turn_counter,
+                :game_over
+
+  def play
     loop do
-      counter.even? ? play_turn(player_1) : play_turn(player_2)
+      turn_counter.even? ? play_turn(player1) : play_turn(player2)
 
-      winning_combo.each { |combo| win = true if combo.uniq.length == 1 }
+      winning_combos.each do |combo|
+        self.game_over = true if combo.uniq.length == 1
+      end
 
-      if win
-        create_board(tiles)
+      if game_over
+        get_winner(turn_counter)
 
-        if counter.even?
-          puts "Winner is #{player_1.name}"
-        else
-          puts "Winner is #{player_2.name}"
-        end
         break
-      elsif counter == 8
+      elsif turn_counter == 8
         puts 'Draw'
 
         break
       end
 
-      counter += 1
+      self.turn_counter += 1
     end
+  end
 
-    play_again
+  def get_winner(turn_counter)
+    create_board(tiles)
+
+    if turn_counter.even?
+      puts "Winner is #{player1.name}"
+    else
+      puts "Winner is #{player2.name}"
+    end
   end
 
   def create_players
     create_board(tiles)
 
     info = get_player(1)
-    @player_1 = Players.new(info[:name], info[:symbol])
+    @player1 = Players.new(info[:name], info[:symbol])
 
     system('clear')
 
     create_board(tiles)
 
     info = get_player(2)
-    @player_2 = Players.new(info[:name], info[:symbol])
+    @player2 = Players.new(info[:name], info[:symbol])
 
     system('clear')
   end
@@ -121,13 +138,7 @@ class Game
       choice = get_choice(player.name)
 
       if tiles.include?(choice)
-        tiles.map! { |tile| tile == choice ? tile = player.symbol : tile }
-
-        winning_combo.each do |combo|
-          combo.map! do |element|
-            element == choice ? element = player.symbol : element
-          end
-        end
+        update_tiles(choice, player)
 
         break
       else
@@ -138,20 +149,32 @@ class Game
     system('clear')
   end
 
-  def play_again
+  def update_tiles(choice, player)
+    tiles.map! { |tile| tile == choice ? player.symbol : tile }
+
+    winning_combos.each do |combo|
+      combo.map! { |element| element == choice ? player.symbol : element }
+    end
+  end
+
+  def repeat
     loop do
       puts 'Do you want to play again [Y\\N]'
 
       choice = gets.chomp.downcase
 
-      case choice
-      when 'y'
-        Game.new.play
-      when 'n'
-        return
-      else
-        puts 'Invalid choice'
-      end
+      handle_choice_repeat(choice)
+    end
+  end
+
+  def handle_choice_repeat(choice)
+    case choice
+    when 'y'
+      Game.new.create_game
+    when 'n'
+      nil
+    else
+      puts 'Invalid choice'
     end
   end
 end
@@ -165,4 +188,4 @@ class Players
   end
 end
 
-Game.new.play
+Game.new.create_game
