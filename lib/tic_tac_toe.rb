@@ -19,9 +19,15 @@ module Display
 
     player_info[:name] = gets.chomp
 
-    puts "Symbol of Player ##{number}: "
+    loop do
+      puts "Symbol of Player ##{number}: "
 
-    player_info[:symbol] = gets.chomp
+      player_info[:symbol] = gets.chomp
+
+      break unless number == 2 && player_info[:symbol] == player_1.symbol
+
+      puts 'Symbol already picked'
+    end
 
     player_info
   end
@@ -76,10 +82,8 @@ class Game
 
         if counter.even?
           puts "Winner is #{player_1.name}"
-
         else
           puts "Winner is #{player_2.name}"
-
         end
         break
       elsif counter == 8
@@ -135,11 +139,20 @@ class Game
   end
 
   def play_again
-    puts "Do you want to play again [Y\N]"
+    loop do
+      puts 'Do you want to play again [Y\\N]'
 
-    choice = gets.chomp
+      choice = gets.chomp.downcase
 
-    Game.new.play if choice.downcase == 'y'
+      case choice
+      when 'y'
+        Game.new.play
+      when 'n'
+        return
+      else
+        puts 'Invalid choice'
+      end
+    end
   end
 end
 
