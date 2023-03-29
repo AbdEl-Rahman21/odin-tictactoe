@@ -1,2 +1,2 @@
 # odin-tictactoe
-This is copied form odin-OOP_Practice to separate the teo game
+This is copied form odin-OOP_Practice to separate the two games

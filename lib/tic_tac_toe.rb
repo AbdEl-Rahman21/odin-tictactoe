@@ -172,7 +172,7 @@ class Game
     when 'y'
       Game.new.create_game
     when 'n'
-      nil
+      exit
     else
       puts 'Invalid choice'
     end
