@@ -16,25 +16,30 @@ class Game
     system('clear')
 
     @players.each_with_index do |player, i|
-      player.get_name(i + 1)
-      i.zero? ? player.get_symbol(i + 1) : player.get_symbol(i + 1, @players[0].symbol)
+      get_player_info(player, i + 1)
     end
   end
 
+  def get_player_info(player, number)
+    player.get_name(number)
+
+    number == 1 ? player.get_symbol(number) : player.get_symbol(number, @players[0].symbol)
+  end
+
   def play
-    until @turn_counter == 8
-      @turn_counter.even? ? play_turn(@players[0]) : play_turn(@players[1])
+    until @turn_counter == 9
+      turn_order
 
-      if game_over?
-        determine_winner
-
-        return
-      end
+      break if game_over?
 
       @turn_counter += 1
     end
 
-    puts Rainbow('Draw').color(:blue)
+    determine_winner
+  end
+
+  def turn_order
+    @turn_counter.even? ? play_turn(@players[0]) : play_turn(@players[1])
   end
 
   def play_turn(player)
@@ -85,7 +90,9 @@ class Game
   def determine_winner
     create_board
 
-    if @turn_counter.even?
+    if @turn_counter == 9
+      puts Rainbow('Draw!').color(:blue)
+    elsif @turn_counter.even?
       puts Rainbow("Winner is #{@players[0].name}").color(:green)
     else
       puts Rainbow("Winner is #{@players[1].name}").color(:green)
