@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../lib/player'
 require 'rainbow'
 
@@ -14,7 +16,7 @@ describe Player do
       end
 
       it 'completes loop and displays error message four times' do
-        expect(player_info).to receive(:puts).with(Rainbow('Invalid symbol!').bg(:red)).exactly(4).times
+        expect(player_info).to receive(:puts).with(Rainbow('Invalid symbol!').color(:red)).exactly(4).times
         player_info.get_symbol(1, 'o')
       end
     end
@@ -32,7 +34,7 @@ describe Player do
       end
 
       it 'completes loop and displays error massage three times' do
-        expect(player_choice).to receive(:puts).with(Rainbow('Error: Your choice must be form 1 to 9.').bg(:red))
+        expect(player_choice).to receive(:puts).with(Rainbow('Error: Your choice must be form 1 to 9.').color(:red))
                                                .exactly(3).times
         player_choice.get_choice
       end

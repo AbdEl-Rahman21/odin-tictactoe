@@ -1,129 +1,94 @@
 # frozen_string_literal: true
 
 require_relative './player'
-require_relative './board'
+require 'rainbow'
 
 class Game
-  include Board
-
   def initialize
     @tiles = Array(1..9)
-    @winning_combos = WINNING_COMBOS
+    @winning_combos = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7],
+                       [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
     @turn_counter = 0
-    @game_over = false
-  end
-
-  def create_game
-    system('clear')
-
-    create_players
-
-    play
-
-    repeat
-  end
-
-  private
-
-  attr_accessor :tiles,
-                :winning_combos,
-                :player1,
-                :player2,
-                :turn_counter,
-                :game_over
-
-  def play
-    loop do
-      turn_counter.even? ? play_turn(player1) : play_turn(player2)
-
-      winning_combos.each do |combo|
-        self.game_over = true if combo.uniq.length == 1
-      end
-
-      if game_over
-        get_winner(turn_counter)
-
-        break
-      elsif turn_counter == 8
-        puts 'Draw'
-
-        break
-      end
-
-      self.turn_counter += 1
-    end
-  end
-
-  def get_winner(turn_counter)
-    create_board(tiles)
-
-    if turn_counter.even?
-      puts "Winner is #{player1.name}"
-    else
-      puts "Winner is #{player2.name}"
-    end
+    @players = [Player.new, Player.new]
   end
 
   def create_players
-    create_board(tiles)
-
-    info = get_player(1)
-    @player1 = Player.new(info[:name], info[:symbol])
-
     system('clear')
 
-    create_board(tiles)
+    @players.each_with_index do |player, i|
+      player.get_name(i + 1)
+      i.zero? ? player.get_symbol(i + 1) : player.get_symbol(i + 1, @players[0].symbol)
+    end
+  end
 
-    info = get_player(2)
-    @player2 = Player.new(info[:name], info[:symbol])
+  def play
+    until @turn_counter == 8
+      @turn_counter.even? ? play_turn(@players[0]) : play_turn(@players[1])
 
-    system('clear')
+      if game_over?
+        determine_winner
+
+        return
+      end
+
+      @turn_counter += 1
+    end
+
+    puts Rainbow('Draw').color(:blue)
   end
 
   def play_turn(player)
-    create_board(tiles)
+    create_board
 
     loop do
-      choice = get_choice(player.name)
+      choice = player.get_choice
 
-      if tiles.include?(choice)
-        update_tiles(choice, player)
+      if @tiles.include?(choice)
+        update_tiles(choice, player.symbol)
 
         break
       else
-        puts 'Error: Tile already picked.'
+        puts Rainbow('Error: Tile already picked.').color(:red)
       end
     end
+  end
 
+  def create_board
     system('clear')
+
+    puts <<~HEREDOC
+      == Open for business ==
+      \t #{@tiles[0]} | #{@tiles[1]} | #{@tiles[2]}#{' '}
+      \t---+---+---#{' '}
+      \t #{@tiles[3]} | #{@tiles[4]} | #{@tiles[5]}#{' '}
+      \t---+---+---#{' '}
+      \t #{@tiles[6]} | #{@tiles[7]} | #{@tiles[8]}#{' '}
+    HEREDOC
   end
 
-  def update_tiles(choice, player)
-    tiles.map! { |tile| tile == choice ? player.symbol : tile }
+  def update_tiles(choice, symbol)
+    @tiles.map! { |tile| tile == choice ? symbol : tile }
 
-    winning_combos.each do |combo|
-      combo.map! { |element| element == choice ? player.symbol : element }
+    @winning_combos.each do |combo|
+      combo.map! { |element| element == choice ? symbol : element }
     end
   end
 
-  def repeat
-    loop do
-      puts 'Do you want to play again [Y\\N]'
-
-      choice = gets.chomp.downcase
-
-      handle_choice_repeat(choice)
+  def game_over?
+    @winning_combos.each do |combo|
+      return true if combo.uniq.length == 1
     end
+
+    false
   end
 
-  def handle_choice_repeat(choice)
-    case choice
-    when 'y'
-      Game.new.create_game
-    when 'n'
-      exit
+  def determine_winner
+    create_board
+
+    if @turn_counter.even?
+      puts Rainbow("Winner is #{@players[0].name}").color(:green)
     else
-      puts 'Invalid choice'
+      puts Rainbow("Winner is #{@players[1].name}").color(:green)
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rainbow'
 
 class Player
@@ -22,7 +24,7 @@ class Player
 
       break unless @symbol.length != 1 || @symbol == picked_symbol || @symbol == ' ' || @symbol.between?('0', '9')
 
-      puts Rainbow('Invalid symbol!').bg(:red)
+      puts Rainbow('Invalid symbol!').color(:red)
     end
   end
 
@@ -34,7 +36,7 @@ class Player
 
       return choice.to_i if choice.length == 1 && choice.between?('1', '9')
 
-      puts Rainbow('Error: Your choice must be form 1 to 9.').bg(:red)
+      puts Rainbow('Error: Your choice must be form 1 to 9.').color(:red)
     end
   end
 end
