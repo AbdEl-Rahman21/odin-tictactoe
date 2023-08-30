@@ -1,19 +1,82 @@
 # frozen_string_literal: true
 
 require_relative './player'
+require_relative './computer'
+require_relative './display'
 require 'rainbow'
 
 class Game
+  include Display
+
   def initialize
     @tiles = Array(1..9)
     @winning_combos = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7],
                        [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
     @turn_counter = 0
-    @players = [Player.new, Player.new]
+    @players = []
+    @game_mode = :e # :e = easy,:n = normal, :h = hard
+  end
+
+  def select_players
+    player_selection
+
+    loop do
+      choice = gets.chomp
+
+      if ('1'..'4').include?(choice)
+        assign_players(choice)
+
+        break
+      else
+        puts Rainbow('Invalid input.').color(:red)
+      end
+    end
+  end
+
+  def assign_players(choice)
+    case choice
+    when '1'
+      @players = [Player.new, Player.new]
+    when '2'
+      @players = [Computer.new, Player.new]
+    when '3'
+      @players = [Player.new, Computer.new]
+    when '4'
+      @players = [Computer.new, Computer.new]
+    end
+  end
+
+  def select_difficulty
+    difficulty_selection
+
+    loop do
+      choice = gets.chomp
+
+      if ('1'..'3').include?(choice)
+        assign_mode(choice)
+
+        break
+      else
+        puts Rainbow('Invalid input.').color(:red)
+      end
+    end
+  end
+
+  def assign_mode(choice)
+    case choice
+    when '1'
+      @game_mode = :e
+    when '2'
+      @game_mode = :n
+    when '3'
+      @game_mode = :h
+    end
   end
 
   def create_players
     system('clear')
+
+    select_difficulty if @players.any? { |e| e.instance_of?(Computer) }
 
     @players.each_with_index do |player, i|
       get_player_info(player, i + 1)
@@ -23,7 +86,7 @@ class Game
   def get_player_info(player, number)
     player.get_name(number)
 
-    number == 1 ? player.get_symbol(number) : player.get_symbol(number, @players[0].symbol)
+    number == 1 ? player.get_symbol : player.get_symbol(@players[0].symbol)
   end
 
   def play
@@ -39,14 +102,14 @@ class Game
   end
 
   def turn_order
-    @turn_counter.even? ? play_turn(@players[0]) : play_turn(@players[1])
+    @turn_counter.even? ? play_turn(@players[0], @players[1].symbol) : play_turn(@players[1], @players[0].symbol)
   end
 
-  def play_turn(player)
-    create_board
+  def play_turn(player, enemy_symbol)
+    create_board(@tiles)
 
     loop do
-      choice = player.get_choice
+      choice = get_player_choice(player, enemy_symbol)
 
       if @tiles.include?(choice)
         update_tiles(choice, player.symbol)
@@ -58,17 +121,19 @@ class Game
     end
   end
 
-  def create_board
-    system('clear')
+  def get_player_choice(player, enemy_symbol)
+    return player.get_choice if player.instance_of?(Player)
 
-    puts <<~HEREDOC
-      == Open for business ==
-      \t #{@tiles[0]} | #{@tiles[1]} | #{@tiles[2]}#{' '}
-      \t---+---+---#{' '}
-      \t #{@tiles[3]} | #{@tiles[4]} | #{@tiles[5]}#{' '}
-      \t---+---+---#{' '}
-      \t #{@tiles[6]} | #{@tiles[7]} | #{@tiles[8]}#{' '}
-    HEREDOC
+    available = @tiles.filter { |tile| tile.instance_of?(Integer) }
+
+    case @game_mode
+    when :e
+      player.get_choice_easy(available)
+    when :n
+      player.get_choice_normal(available, @winning_combos, enemy_symbol)
+    when :h
+      player.get_choice_hard(available, @winning_combos, enemy_symbol)
+    end
   end
 
   def update_tiles(choice, symbol)
@@ -88,7 +153,7 @@ class Game
   end
 
   def determine_winner
-    create_board
+    create_board(@tiles)
 
     if @turn_counter == 9
       puts Rainbow('Draw!').color(:blue)

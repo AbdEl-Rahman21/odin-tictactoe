@@ -6,6 +6,8 @@ def start
   loop do
     game = Game.new
 
+    game.select_players
+
     game.create_players
 
     game.play

@@ -19,7 +19,7 @@ describe Game do
       it "calls #get_symbol with the player1's symbol" do
         player_number = 2
         player1_symbol = 'x'
-        expect(players_info).to receive(:get_symbol).with(player_number, player1_symbol)
+        expect(players_info).to receive(:get_symbol).with(player1_symbol)
         game_players.get_player_info(players_info, player_number)
       end
     end
@@ -76,15 +76,16 @@ describe Game do
         valid_tile = 1
         game_turn.instance_variable_set(:@tiles, [1, 2, 3, player_symbol, 5, 6, player_symbol, 8, 9])
         allow(player_choice).to receive(:symbol).and_return(player_symbol)
-        allow(player_choice).to receive(:get_choice).and_return(picked_tiles[0], picked_tiles[1], valid_tile)
         allow(game_turn).to receive(:create_board)
         allow(game_turn).to receive(:update_tiles)
+        allow(game_turn).to receive(:get_player_choice).and_return(picked_tiles[0], picked_tiles[1], valid_tile)
       end
 
       it 'displays error massage twice' do
+        enemy_symbol = 'o'
         massage = Rainbow('Error: Tile already picked.').color(:red)
         expect(game_turn).to receive(:puts).with(massage).twice
-        game_turn.play_turn(player_choice)
+        game_turn.play_turn(player_choice, enemy_symbol)
       end
     end
 
@@ -93,13 +94,14 @@ describe Game do
         player_symbol = 'x'
         valid_tile = 1
         allow(player_choice).to receive(:symbol).and_return(player_symbol)
-        allow(player_choice).to receive(:get_choice).and_return(valid_tile)
+        allow(game_turn).to receive(:get_player_choice).and_return(valid_tile)
         allow(game_turn).to receive(:create_board)
       end
 
       it 'calls #update_tiles' do
+        enemy_symbol = 'o'
         expect(game_turn).to receive(:update_tiles).with(1, 'x')
-        game_turn.play_turn(player_choice)
+        game_turn.play_turn(player_choice, enemy_symbol)
       end
     end
   end

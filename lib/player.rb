@@ -11,14 +11,16 @@ class Player
   end
 
   def get_name(number)
+    system('clear')
+
     print "Enter name of Player ##{number}: "
 
     @name = gets.chomp
   end
 
-  def get_symbol(number, picked_symbol = '')
+  def get_symbol(picked_symbol = '')
     loop do
-      print "Enter symbol (single character) of Player ##{number}: "
+      print "#{@name}, enter your symbol: "
 
       @symbol = gets.chomp
 
