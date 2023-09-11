@@ -10,3 +10,7 @@ Tic-tac-toe (American English), noughts and crosses (Commonwealth English), or X
 
 - There is an additional Computer AI with three difficulty levels.
 - The first 6 commits of this repository are copied form the (odin-OOP_Practice) to separate it form Mastermind
+
+### Play
+
+[Play here](https://replit.com/@AbdEl-Rahman21/Tic-Tac-Toe)
