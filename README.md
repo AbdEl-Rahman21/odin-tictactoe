@@ -8,5 +8,5 @@ Tic-tac-toe (American English), noughts and crosses (Commonwealth English), or X
 
 ### Notes
 
-1- There is an additional Computer AI with three difficulty levels.
-2- The first 6 commits of this repository are copied form the (odin-OOP_Practice) to separate it form Mastermind
+- There is an additional Computer AI with three difficulty levels.
+- The first 6 commits of this repository are copied form the (odin-OOP_Practice) to separate it form Mastermind
