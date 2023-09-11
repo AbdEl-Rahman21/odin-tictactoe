@@ -33,6 +33,18 @@ describe Computer do
       end
     end
 
+    context 'when middle is available' do
+      before do
+        allow(computer_choice).to receive(:can_win).and_return(nil)
+        allow(computer_choice).to receive(:can_lose).and_return(nil)
+      end
+
+      it 'returns the 5' do
+        tiles = [1, 2, 5]
+        expect(computer_choice.get_choice_hard(tiles, combos, enemy_symbol)).to eq(5)
+      end
+    end
+
     context 'when #diagonal_priority returns a number' do
       before do
         allow(computer_choice).to receive(:can_win).and_return(nil)

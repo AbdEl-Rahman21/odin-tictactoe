@@ -29,6 +29,8 @@ class Computer
 
     return choice unless choice.nil?
 
+    return 5 if tiles.include?(5)
+
     choice = diagonal_priority(tiles, [combos[6], combos[7]], enemy_symbol)
 
     return choice unless choice.nil?
