@@ -1,6 +1,6 @@
 # Tic Tac Toe
 
-The first of two project for the [The Odin Project](https://www.theodinproject.com/lessons/ruby-tic-tac-toe) OOP course. It was later used for practice for the [Rspec course](https://www.theodinproject.com/lessons/ruby-connect-four#assignment-1).
+The first of two projects for the [The Odin Project](https://www.theodinproject.com/lessons/ruby-tic-tac-toe) OOP course. It was later used for practice for the [Rspec course](https://www.theodinproject.com/lessons/ruby-connect-four#assignment-1).
 
 ## Description
 
@@ -9,7 +9,7 @@ Tic-tac-toe (American English), noughts and crosses (Commonwealth English), or X
 ### Notes
 
 - There is an additional Computer AI with three difficulty levels.
-- The first 6 commits of this repository are copied form the (odin-OOP_Practice) to separate it form Mastermind
+- The first 6 commits of this repository are copied form the (odin-OOP_Practice) to separate it form Mastermind.
 
 ### Play
 
